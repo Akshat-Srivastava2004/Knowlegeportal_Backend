@@ -1,0 +1,21 @@
+Question,Option1,Option2,Option3,Option4,CorrectAnswer
+Which of the following is not an operating system?,Windows,Linux,Oracle,Mac OS,Oracle
+In operating systems, what does GUI stand for?,Graphical Uninstall Interface,Graphical User Interaction,Graphical User Interface,General User Interface
+Which of the following is a type of scheduling algorithm?,Round Robin,Random Scheduling,Priority Sorting,Memory Allocation,Round Robin
+What is the full form of IPC in operating systems?,Interprocess Communication,Internal Protocol Control,Inter-process Control,Interface Processing Communication,Interprocess Communication
+Which of the following is used to bring a page into memory only when it is needed?,Demand Paging,Page Replacement,Swapping,Segmentation,Demand Paging
+Which of the following is not a type of memory?,RAM,ROM,Cache,Dataflow,Dataflow
+A process that waits for a resource indefinitely is in what kind of state?,Running,Ready,Deadlock,Suspended,Deadlock
+Which technique is used to reduce the size of the memory footprint?,Segmentation,Paging,Virtualization,Compression,Compression
+Which of the following is a synchronization tool?,Mutex,Thread,Semaphore,Pipe,Semaphore
+What is the purpose of a system call in an OS?,Hardware Management,Process Management,Program Interaction,To request services from the kernel,To request services from the kernel
+What type of memory is volatile?,ROM,RAM,Hard Disk,CD-ROM,RAM
+Which algorithm chooses the process with the shortest expected processing time?,FCFS,Round Robin,SRTF,Priority Scheduling,SRTF
+Which of the following is not a real-time OS?,VxWorks,RTLinux,Windows 10,FreeRTOS,Windows 10
+Which of the following describes a thread?,A lightweight process,A heavyweight process,Part of a virtual machine,A program counter,A lightweight process
+Which of the following is used to prevent thrashing?,Page Fault Frequency,Virtualization,Page Buffering,Segmentation,Page Fault Frequency
+Which system uses the concept of time-sharing?,Mainframe,Microprocessor,Multitasking,Distributed Systems,Multitasking
+What is swapping in operating systems?,Exchanging two processes in memory,Swapping values of registers,Switching from one operating system to another,Bringing a process in and out of the main memory,Bringing a process in and out of the main memory
+What is the purpose of the 'fork()' system call in Unix?,To terminate a process,To create a new process,To increase CPU cycles,To create a new thread,To create a new process
+Which is the least restrictive access control mechanism?,Read-Write Access,Read-Only Access,Execute-Only Access,No Access,Read-Write Access
+Which of the following is a hardware solution for concurrency?,Memory Locking,Mutex,Atomic Instructions,Semaphore,Atomic Instructions
