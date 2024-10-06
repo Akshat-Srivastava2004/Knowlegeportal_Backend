@@ -23,6 +23,7 @@ import (
 
 // CreateUser handles user creation
 func CreateUser(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "https://knowlegeportal-production.up.railway.app/")
 	w.Header().Set("Content-Type", "multipart/form-data")
 	w.Header().Set("Access-Control-Allow-Methods", "POST")
 
@@ -131,6 +132,7 @@ var store = sessions.NewCookieStore([]byte("abcefghljfjkfkjnjkanjjabjgddghadjh")
 
 func Checkuser(w http.ResponseWriter, r *http.Request) {
 	// Set response headers
+	w.Header().Set("Access-Control-Allow-Origin", "https://knowlegeportal-production.up.railway.app/")
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Methods", "POST")
 

@@ -11,6 +11,7 @@ import (
 
 // Feedback handles feedback submission from users
 func Feedback(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "https://knowlegeportal-production.up.railway.app/")
 	// Set CORS headers
 	w.Header().Set("Access-Control-Allow-Methods", "POST")
 

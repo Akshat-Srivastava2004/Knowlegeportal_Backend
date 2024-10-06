@@ -12,6 +12,7 @@ import (
 
 // File Upload Handler
 func UploadFile(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "https://knowlegeportal-production.up.railway.app/")
 	// Parse form data
 	r.ParseMultipartForm(10 << 20) // Limit file size to 10MB
 

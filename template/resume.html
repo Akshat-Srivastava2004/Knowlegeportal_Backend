@@ -72,7 +72,7 @@
     <div class="container mt-5">
         <h2 class="text-center mb-4">Teacher Resume Submission</h2>
         <p class="text-center mb-5">Please upload your resume for evaluation. Ensure that your file is in PDF format and not larger than 2MB.</p>
-        <form action="http://localhost:8000/teacherresume" method="post" enctype="multipart/form-data">
+        <form action="/teacherresume" method="post" enctype="multipart/form-data">
             <div class="mb-3">
                 <label for="resume" class="form-label">Upload Resume (PDF only)</label>
                 <input type="file" class="form-control" id="resume" name="resume" accept=".pdf" required>

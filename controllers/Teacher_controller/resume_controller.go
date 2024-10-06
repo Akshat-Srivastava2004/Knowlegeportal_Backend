@@ -222,6 +222,7 @@ func TeacherDashboard(w http.ResponseWriter, r *http.Request) {
 
 // Function to handle the resume upload and scoring
 func UploadResumeHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "https://knowlegeportal-production.up.railway.app/")
 	// Parse the multipart form
 	err := r.ParseMultipartForm(10 << 20) // Max 10MB file size
 	if err != nil {
