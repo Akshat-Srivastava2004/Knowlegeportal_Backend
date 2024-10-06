@@ -23,6 +23,7 @@ import (
 
 // CreateUser handles user creation
 func CreateUserstudent(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "https://storied-ganache-31318f.netlify.app")
 	w.Header().Set("Content-Type", "multipart/form-data")
 	w.Header().Set("Access-Control-Allow-Methods", "POST")
 
