@@ -8,7 +8,7 @@ import (
 func Router(r *mux.Router) {
 
 	r.HandleFunc("/teacherregister", teachercontroller.CreateUser).Methods("POST")
-	r.HandleFunc("/teacherlogin", teachercontroller.Checkuser).Methods("POST")
+	r.HandleFunc("/teacherlogin", teachercontroller.Checkuserserver).Methods("POST")
 	r.HandleFunc("/teacherresume", teachercontroller.UploadResumeHandler).Methods("POST")
 	r.HandleFunc("/teacherdetails", teachercontroller.TeacherDashboard).Methods("GET")
 	r.HandleFunc("/teachertest", teachercontroller.TeacherMCq).Methods("GET")
