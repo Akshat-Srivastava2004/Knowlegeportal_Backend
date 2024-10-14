@@ -161,8 +161,8 @@ func Checkuserserver(w http.ResponseWriter, r *http.Request) {
 	email := r.FormValue("Email")
 	password := r.FormValue("Password")
 
-	fmt.Println("User entered email:", email)
-	fmt.Println("User entered password:", password)
+	fmt.Println("User entered email is :", email)
+	fmt.Println("User entered password is :", password)
 
 	// Create a context with a timeout for MongoDB operations
 	ctx, cancel := context.WithTimeout(context.Background(), 40*time.Second)
