@@ -144,6 +144,18 @@ func Checkuserserver(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Methods", "POST")
+	// Ensure the method is POST
+	if r.Method != http.MethodPost {
+		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+		return
+	}
+
+	// Parse the form data (for x-www-form-urlencoded)
+	abc := r.ParseForm()
+	if abc != nil {
+		http.Error(w, "Failed to parse form data", http.StatusBadRequest)
+		return
+	}
 
 	// Retrieve email and password from the form
 	email := r.FormValue("Email")
