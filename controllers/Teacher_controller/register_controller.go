@@ -137,6 +137,12 @@ type Claims struct {
 	jwt.RegisteredClaims
 }
 
+// Struct for the login request
+type LoginRequest struct {
+	Email    string `json:"Email"`
+	Password string `json:"Password"`
+}
+
 var store = sessions.NewCookieStore([]byte("abcefghljfjkfkjnjkanjjabjgddghadjh"))
 
 // Checkuser validates the teacher's login credentials and returns JWT tokens
@@ -156,16 +162,17 @@ func Checkuserserver(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	fmt.Println("Request Body:", string(body))
-	// Parse the form data (for x-www-form-urlencoded)
-	abc := r.ParseForm()
-	if abc != nil {
-		http.Error(w, "Failed to parse form data", http.StatusBadRequest)
+	// Unmarshal the JSON into the LoginRequest struct
+	var loginRequest LoginRequest
+	abf := json.Unmarshal(body, &loginRequest)
+	if abf != nil {
+		http.Error(w, "Failed to parse JSON", http.StatusBadRequest)
 		return
 	}
 
-	// Retrieve email and password from the form
-	email := r.FormValue("Email")
-	password := r.FormValue("Password")
+	// Now you can access the email and password from the struct
+	email := loginRequest.Email
+	password := loginRequest.Password
 
 	fmt.Println("User entered email is :", email)
 	fmt.Println("User entered password is :", password)
