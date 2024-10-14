@@ -2,6 +2,7 @@ package teachercontroller
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -15,6 +16,7 @@ import (
 	"github.com/Akshat-Srivastava2004/educationportal/helper"
 	model "github.com/Akshat-Srivastava2004/educationportal/models/Teacher_model"
 	"github.com/cloudinary/cloudinary-go/v2/api/uploader"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/gorilla/sessions"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -128,65 +130,111 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// Define the JWT Claims structure
+type Claims struct {
+	Email string `json:"email"`
+	jwt.RegisteredClaims
+}
+
 var store = sessions.NewCookieStore([]byte("abcefghljfjkfkjnjkanjjabjgddghadjh"))
 
+// Checkuser validates the teacher's login credentials and returns JWT tokens
 func Checkuser(w http.ResponseWriter, r *http.Request) {
 	// Set response headers
 	w.Header().Set("Access-Control-Allow-Origin", "https://knowlegeportal-production.up.railway.app/")
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Methods", "POST")
 
-	// Get email and password from the form
+	// Retrieve email and password from the form
 	email := r.FormValue("Email")
 	password := r.FormValue("Password")
-	fmt.Println("the user enter password is ", email)
-	fmt.Println("the user enter password is ", password)
-	// Create a context with a timeout for the database operation
+
+	fmt.Println("User entered email:", email)
+	fmt.Println("User entered password:", password)
+
+	// Create a context with a timeout for MongoDB operations
 	ctx, cancel := context.WithTimeout(context.Background(), 40*time.Second)
 	defer cancel()
+
+	// Access the TeacherProfile collection in MongoDB
 	collection := database.GetCollection("TeacherProfile")
 
-	// Find the user in the database
+	// Search for the user in the database using email
 	var user model.TeacherProfile
 	err := collection.FindOne(ctx, bson.M{"email": email}).Decode(&user)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
-			// Email not found in the database
-			http.Error(w, "User not found", http.StatusUnauthorized)
-			return
-		} else {
-			// Other errors (e.g., database connection issues)
-			http.Error(w, "Internal server error", http.StatusInternalServerError)
+			// User not found in the database
+			http.Error(w, `{"error": "User not found"}`, http.StatusUnauthorized)
 			return
 		}
+		// Internal server error (database issue)
+		http.Error(w, `{"error": "Internal server error"}`, http.StatusInternalServerError)
+		return
 	}
-	fmt.Println("Stored hashed password:", user.Password)
-	fmt.Println("User provided password:", password)
 
+	// Compare the hashed password with the provided password
 	password = strings.TrimSpace(password)
 	user.Password = strings.TrimSpace(user.Password)
-	hashedPwdBytes := user.Password
-	fmt.Println("the string hash password is ", hashedPwdBytes)
 
-	err = bcrypt.CompareHashAndPassword([]byte(hashedPwdBytes), []byte(password))
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
 	if err != nil {
-
 		fmt.Println("Password comparison failed:", err)
-		http.Error(w, "Invalid credentials", http.StatusUnauthorized)
+		http.Error(w, `{"error": "Invalid credentials"}`, http.StatusUnauthorized)
 		return
-	} else {
-		fmt.Println("password matched")
-	}
-	session, _ := store.Get(r, "Teacher-session")
-	session.Values["email"] = user.Email
-	session.Values["username"] = user.Username
-	session.Values["fullname"] = user.Fullname
-	session.Values["course"] = user.CourseTeach
-	session.Options = &sessions.Options{
-		MaxAge:   3600, // 10 seconds
-		HttpOnly: true, // Only accessible via HTTP (not JavaScript)
 	}
 
-	session.Save(r, w) // Save the session
-	http.Redirect(w, r, "/resume.html", http.StatusSeeOther)
+	// Password matched
+	fmt.Println("Password matched")
+
+	// Generate JWT access and refresh tokens
+	accessToken, err := generateToken(email, os.Getenv("ACCESS_TOKEN_SECRET"), os.Getenv("ACCESS_TOKEN_EXPIRY"))
+	if err != nil {
+		fmt.Println("Error generating access token:", err)
+		http.Error(w, `{"error": "Failed to generate access token"}`, http.StatusInternalServerError)
+		return
+	}
+
+	refreshToken, err := generateToken(email, os.Getenv("REFRESH_TOKEN_SECRET"), os.Getenv("REFRESH_TOKEN_EXPIRY"))
+	if err != nil {
+		fmt.Println("Error generating refresh token:", err)
+		http.Error(w, `{"error": "Failed to generate refresh token"}`, http.StatusInternalServerError)
+		return
+	}
+
+	// Send the tokens in the response
+	response := map[string]string{
+		"access_token":  accessToken,
+		"refresh_token": refreshToken,
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(response)
+}
+
+// Helper function to generate JWT tokens
+func generateToken(email, secret, expiry string) (string, error) {
+	// Convert expiry time from string to duration
+	expiryDuration, err := time.ParseDuration(expiry)
+	if err != nil {
+		return "", err
+	}
+
+	// Define the JWT claims
+	claims := &Claims{
+		Email: email,
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(expiryDuration)),
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
+		},
+	}
+
+	// Generate the JWT token
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	tokenString, err := token.SignedString([]byte(secret))
+	if err != nil {
+		return "", err
+	}
+
+	return tokenString, nil
 }
