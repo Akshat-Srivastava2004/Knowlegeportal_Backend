@@ -133,8 +133,12 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 
 // Define the JWT Claims structure
 type Claims struct {
-	Email  string `json:"email"`
-	Course string `json:"course"`
+	Gender       string `json:"gender"`
+	Phonenumber  int64  `json:"phonenumber"`
+	Profilephoto string `json:"profilephoto"`
+	Username     string `json:"username"`
+	Email        string `json:"email"`
+	Course       string `json:"course"`
 	jwt.RegisteredClaims
 }
 
@@ -213,15 +217,19 @@ func Checkuserserver(w http.ResponseWriter, r *http.Request) {
 	// Password matched
 	fmt.Println("Password matched")
 	course := user.CourseTeach
+	username := user.Username
+	profilephoto := user.ProfilePhotoURL
+	phonenumber := user.Phonenumber
+	gender := user.Gender
 	// Generate JWT access and refresh tokens
-	accessToken, err := generateToken(course, email, os.Getenv("ACCESS_TOKEN_SECRET"), os.Getenv("ACCESS_TOKEN_EXPIRY"))
+	accessToken, err := generateToken(gender, phonenumber, profilephoto, username, course, email, os.Getenv("ACCESS_TOKEN_SECRET"), os.Getenv("ACCESS_TOKEN_EXPIRY"))
 	if err != nil {
 		fmt.Println("Error generating access token:", err)
 		http.Error(w, `{"error": "Failed to generate access token"}`, http.StatusInternalServerError)
 		return
 	}
 
-	refreshToken, err := generateToken(course, email, os.Getenv("REFRESH_TOKEN_SECRET"), os.Getenv("REFRESH_TOKEN_EXPIRY"))
+	refreshToken, err := generateToken(gender, phonenumber, profilephoto, username, course, email, os.Getenv("REFRESH_TOKEN_SECRET"), os.Getenv("REFRESH_TOKEN_EXPIRY"))
 	if err != nil {
 		fmt.Println("Error generating refresh token:", err)
 		http.Error(w, `{"error": "Failed to generate refresh token"}`, http.StatusInternalServerError)
@@ -239,7 +247,7 @@ func Checkuserserver(w http.ResponseWriter, r *http.Request) {
 }
 
 // Helper function to generate JWT tokens
-func generateToken(course, email, secret, expiry string) (string, error) {
+func generateToken(gender string, phonenumber int64, profilephoto, username, course, email, secret, expiry string) (string, error) {
 	// Convert expiry time from string to duration
 	expiryDuration, err := time.ParseDuration(expiry)
 	if err != nil {
@@ -248,8 +256,12 @@ func generateToken(course, email, secret, expiry string) (string, error) {
 
 	// Define the JWT claims
 	claims := &Claims{
-		Email:  email,
-		Course: course,
+		Phonenumber:  phonenumber,
+		Gender:       gender,
+		Profilephoto: profilephoto,
+		Username:     username,
+		Email:        email,
+		Course:       course,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(expiryDuration)),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
