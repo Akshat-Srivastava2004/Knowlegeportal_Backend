@@ -134,13 +134,13 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 
 // Define the JWT Claims structure
 type Claims struct {
-	Teacherid    primitive.ObjectID `json:"teacherid"`
-	Gender       string             `json:"gender"`
-	Phonenumber  int64              `json:"phonenumber"`
-	Profilephoto string             `json:"profilephoto"`
-	Username     string             `json:"username"`
-	Email        string             `json:"email"`
-	Course       string             `json:"course"`
+	Teacherid    string `json:"teacherid"`
+	Gender       string `json:"gender"`
+	Phonenumber  int64  `json:"phonenumber"`
+	Profilephoto string `json:"profilephoto"`
+	Username     string `json:"username"`
+	Email        string `json:"email"`
+	Course       string `json:"course"`
 	jwt.RegisteredClaims
 }
 
@@ -259,7 +259,7 @@ func generateToken(id primitive.ObjectID, gender string, phonenumber int64, prof
 
 	// Define the JWT claims
 	claims := &Claims{
-		Teacherid:    id,
+		Teacherid:    id.Hex(),
 		Phonenumber:  phonenumber,
 		Gender:       gender,
 		Profilephoto: profilephoto,
