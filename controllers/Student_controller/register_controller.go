@@ -2,8 +2,10 @@ package studentcontroller
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"strconv"
@@ -15,8 +17,10 @@ import (
 	"github.com/Akshat-Srivastava2004/educationportal/helper"
 	model "github.com/Akshat-Srivastava2004/educationportal/models/Student_model"
 	"github.com/cloudinary/cloudinary-go/v2/api/uploader"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/gorilla/sessions"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -128,20 +132,56 @@ func CreateUserstudent(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// Struct for the login request
+type LoginRequest struct {
+	Email    string `json:"Email"`
+	Password string `json:"Password"`
+}
+
+// Define the JWT Claims structure
+type Claims struct {
+	Studentid    string `json:"studentid"`
+	Gender       string `json:"gender"`
+	Phonenumber  int64  `json:"phonenumber"`
+	Profilephoto string `json:"profilephoto"`
+	Username     string `json:"username"`
+	Email        string `json:"email"`
+	Course       string `json:"course"`
+	jwt.RegisteredClaims
+}
+
 var Store = sessions.NewCookieStore([]byte("abcefghljfjkfkjnjkanjjadddwdbjgddghadjh"))
 
 func Checkuserstudent(w http.ResponseWriter, r *http.Request) {
 	// Set response headers
-	w.Header().Set("Access-Control-Allow-Origin", "https://knowlegeportal-production.up.railway.app/")
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Content-Type", "application/x-www-form-urlencoded")
 	w.Header().Set("Access-Control-Allow-Methods", "POST")
-
 	// Get email and password from the form
-	email := r.FormValue("Email")
-	password := r.FormValue("Password")
+	if r.Method != http.MethodPost {
+		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+		return
+	}
+	body, akb := ioutil.ReadAll(r.Body)
+	if akb != nil {
+		http.Error(w, "Failed to read request body", http.StatusInternalServerError)
+		return
+	}
+	fmt.Println("Request Body:", string(body))
+	// Unmarshal the JSON into the LoginRequest struct
+	var loginRequest LoginRequest
+	abf := json.Unmarshal(body, &loginRequest)
+	if abf != nil {
+		http.Error(w, "Failed to parse JSON", http.StatusBadRequest)
+		return
+	}
 
-	fmt.Println("The user entered email is:", email)
-	fmt.Println("The user entered password is:", password)
+	// Now you can access the email and password from the struct
+	email := loginRequest.Email
+	password := loginRequest.Password
+
+	fmt.Println("User entered email is :", email)
+	fmt.Println("User entered password is :", password)
 
 	// Create a context with a timeout for the database operation
 	ctx, cancel := context.WithTimeout(context.Background(), 40*time.Second)
@@ -180,51 +220,90 @@ func Checkuserstudent(w http.ResponseWriter, r *http.Request) {
 	} else {
 		fmt.Println("Password matched")
 	}
-
-	// smtpHost := os.Getenv("EMAIL_HOST")
-	// smtpPort := os.Getenv("EMAIL_PORT")
-	// from := os.Getenv("EMAIL_HOST_USER")
-	// smtpPassword := os.Getenv("EMAIL_HOST_PASSWORD") // Renamed to avoid conflict with the user's password
-
-	// to := []string{email} // smtp.SendMail expects a slice of strings
-
-	// subject := "Subject: Login Notification\n"
-	// body := "You have successfully logged in!"
-	// message := []byte(subject + "\n" + body)
-
-	// auth := smtp.PlainAuth("", from, smtpPassword, smtpHost)
-
-	// // Send the email
-	// err = smtp.SendMail(smtpHost+":"+smtpPort, auth, from, to, message)
-	// if err != nil {
-	// 	fmt.Println("Failed to send email:", err)
-	// 	http.Error(w, "Failed to send email notification", http.StatusInternalServerError)
-	// 	return
-	// }
-	// fmt.Println("Email sent successfully to:", email)
-
-	// Create a new session and store the user's details in the session
-	session, err := Store.Get(r, "Student-session")
+	course := user.Courseselected
+	username := user.Username
+	profilephoto := user.ProfilePhotoURL
+	phonenumber := user.Phonenumber
+	gender := user.Gender
+	id := user.ID
+	// Generate JWT access and refresh tokens
+	accessToken, err := generateToken(id, gender, phonenumber, profilephoto, username, course, email, os.Getenv("ACCESS_TOKEN_SECRET"), os.Getenv("ACCESS_TOKEN_EXPIRY"))
 	if err != nil {
-		http.Error(w, "Failed to create session", http.StatusInternalServerError)
+		fmt.Println("Error generating access token:", err)
+		http.Error(w, `{"error": "Failed to generate access token"}`, http.StatusInternalServerError)
 		return
 	}
-	// session.Values["studendid"] = user.ID
-	session.Values["email"] = user.Email
-	session.Values["username"] = user.Username
-	session.Values["fullname"] = user.Fullname
-	session.Values["profilephoto"] = user.ProfilePhotoURL
-	session.Options = &sessions.Options{
-		MaxAge:   3600, // 1 hour
-		HttpOnly: true, // Only accessible via HTTP (not JavaScript)
-	}
 
-	err = session.Save(r, w) // Save the session
+	refreshToken, err := generateToken(id, gender, phonenumber, profilephoto, username, course, email, os.Getenv("REFRESH_TOKEN_SECRET"), os.Getenv("REFRESH_TOKEN_EXPIRY"))
 	if err != nil {
-		fmt.Println("Error saving session:", err) // More context
-		http.Error(w, "Failed to save session", http.StatusInternalServerError)
+		fmt.Println("Error generating refresh token:", err)
+		http.Error(w, `{"error": "Failed to generate refresh token"}`, http.StatusInternalServerError)
 		return
 	}
-	// Redirect to the index page after login
-	http.Redirect(w, r, "/index.html", http.StatusSeeOther)
+
+	// Send the tokens in the response
+	response := map[string]string{
+		"access_token":  accessToken,
+		"refresh_token": refreshToken,
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(response)
 }
+
+// Helper function to generate JWT tokens
+func generateToken(id primitive.ObjectID, gender string, phonenumber int64, profilephoto, username, course, email, secret, expiry string) (string, error) {
+	// Convert expiry time from string to duration
+	expiryDuration, err := time.ParseDuration(expiry)
+	if err != nil {
+		return "", err
+	}
+
+	// Define the JWT claims
+	claims := &Claims{
+		Studentid:    id.Hex(),
+		Phonenumber:  phonenumber,
+		Gender:       gender,
+		Profilephoto: profilephoto,
+		Username:     username,
+		Email:        email,
+		Course:       course,
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(expiryDuration)),
+			IssuedAt:  jwt.NewNumericDate(time.Now()),
+		},
+	}
+
+	// Generate the JWT token
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	tokenString, err := token.SignedString([]byte(secret))
+	if err != nil {
+		return "", err
+	}
+
+	return tokenString, nil
+}
+
+// smtpHost := os.Getenv("EMAIL_HOST")
+// smtpPort := os.Getenv("EMAIL_PORT")
+// from := os.Getenv("EMAIL_HOST_USER")
+// smtpPassword := os.Getenv("EMAIL_HOST_PASSWORD") // Renamed to avoid conflict with the user's password
+
+// to := []string{email} // smtp.SendMail expects a slice of strings
+
+// subject := "Subject: Login Notification\n"
+// body := "You have successfully logged in!"
+// message := []byte(subject + "\n" + body)
+
+// auth := smtp.PlainAuth("", from, smtpPassword, smtpHost)
+
+// // Send the email
+// err = smtp.SendMail(smtpHost+":"+smtpPort, auth, from, to, message)
+// if err != nil {
+// 	fmt.Println("Failed to send email:", err)
+// 	http.Error(w, "Failed to send email notification", http.StatusInternalServerError)
+// 	return
+// }
+// fmt.Println("Email sent successfully to:", email)
+
+// Create a new session and store the user's details in the session
