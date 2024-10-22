@@ -189,7 +189,7 @@ func Checkuserstudent(w http.ResponseWriter, r *http.Request) {
 	defer cancel()
 
 	collection := database.GetCollection("StudentProfile")
-	collection1 := database.GetCollection(" StudentEnrolled")
+	collection1 := database.GetCollection("StudentEnrollment")
 	// Find the user in the database
 	var user model.StudentProfile
 	err := collection.FindOne(ctx, bson.M{"email": email}).Decode(&user)
