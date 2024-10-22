@@ -59,16 +59,16 @@ func Enrolledstudent(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Inserted enrollment ID:", insertedID)
 	fmt.Printf("Course enrollment updated successfully for course '%s'. Update result: %+v\n", coursename, updateResult)
 
-	profileUpdateResult, err := database.AddSelectedCourse(email, coursename)
-	if err != nil {
-		// Log the error for debugging
-		fmt.Printf("Failed to update student profile for email '%s': %v\n", email, err)
-		http.Error(w, "Failed to update student profile", http.StatusInternalServerError)
-		return
-	}
+	// profileUpdateResult, err := database.AddSelectedCourse(email, coursename)
+	// if err != nil {
+	// 	// Log the error for debugging
+	// 	fmt.Printf("Failed to update student profile for email '%s': %v\n", email, err)
+	// 	http.Error(w, "Failed to update student profile", http.StatusInternalServerError)
+	// 	return
+	// }
 
-	// Log successful update
-	fmt.Printf("Student profile updated successfully for student '%s'. Update result: %+v\n", email, profileUpdateResult)
+	// // Log successful update
+	// fmt.Printf("Student profile updated successfully for student '%s'. Update result: %+v\n", email, profileUpdateResult)
 
 	// Redirect the user back to the form page after successful enrollment
 	http.Redirect(w, r, "/index.html", http.StatusSeeOther)

@@ -235,7 +235,7 @@ func Checkuserstudent(w http.ResponseWriter, r *http.Request) {
 	// course := user.Courseselected
 	// fmt.Println("the user course is ", course)
 	course := user1.Coursename
-	fmt.Println("the course is ", course)
+	fmt.Println("the course name is ", course)
 	username := user.Username
 	profilephoto := user.ProfilePhotoURL
 	phonenumber := user.Phonenumber

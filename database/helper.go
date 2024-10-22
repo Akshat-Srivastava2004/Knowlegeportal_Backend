@@ -109,69 +109,69 @@ func UpdateStudentEnrollment(courseName string) (*mongo.UpdateResult, error) {
 	// Return the result of the update operation
 	return updateResult, nil
 }
-func AddSelectedCourse(email string, courseName string) (*mongo.UpdateResult, error) {
-	// Get the reference to the student profile collection
-	collection := GetCollection("StudentProfile")
+// func AddSelectedCourse(email string, courseName string) (*mongo.UpdateResult, error) {
+// 	// Get the reference to the student profile collection
+// 	collection := GetCollection("StudentProfile")
 
-	// Define the filter to find the student by their email
-	filter := bson.M{"email": email}
+// 	// Define the filter to find the student by their email
+// 	filter := bson.M{"email": email}
 
-	// Check if the student profile exists
-	var studentProfile studentModel.StudentProfile
-	err := collection.FindOne(context.Background(), filter).Decode(&studentProfile)
-	if err != nil {
-		if err == mongo.ErrNoDocuments {
-			// If no document is found, return a clear error message
-			fmt.Printf("No student profile found for email: %s\n", email)
-			return nil, fmt.Errorf("no student profile found for email: %s", email)
-		}
-		// Return the error if there is an issue decoding the document
-		fmt.Printf("Error finding student profile: %v\n", err)
-		return nil, err
-	}
+// 	// Check if the student profile exists
+// 	var studentProfile studentModel.StudentProfile
+// 	err := collection.FindOne(context.Background(), filter).Decode(&studentProfile)
+// 	if err != nil {
+// 		if err == mongo.ErrNoDocuments {
+// 			// If no document is found, return a clear error message
+// 			fmt.Printf("No student profile found for email: %s\n", email)
+// 			return nil, fmt.Errorf("no student profile found for email: %s", email)
+// 		}
+// 		// Return the error if there is an issue decoding the document
+// 		fmt.Printf("Error finding student profile: %v\n", err)
+// 		return nil, err
+// 	}
 
-	// Check if courseselected is null or not an array and initialize it as an empty array
-	if studentProfile.Courseselected == "" {
-		fmt.Printf("Initializing 'courseselected' as an empty array for email: %s\n", email)
+// 	// Check if courseselected is null or not an array and initialize it as an empty array
+// 	if studentProfile.Courseselected == "" {
+// 		fmt.Printf("Initializing 'courseselected' as an empty array for email: %s\n", email)
 
-		// Initialize courseselected as an empty array
-		update := bson.M{
-			"$set": bson.M{
-				"courseselected": []string{},
-			},
-		}
+// 		// Initialize courseselected as an empty array
+// 		update := bson.M{
+// 			"$set": bson.M{
+// 				"courseselected": []string{},
+// 			},
+// 		}
 
-		_, err := collection.UpdateOne(context.Background(), filter, update)
-		if err != nil {
-			fmt.Printf("Error initializing 'courseselected' as array: %v\n", err)
-			return nil, err
-		}
-	}
+// 		_, err := collection.UpdateOne(context.Background(), filter, update)
+// 		if err != nil {
+// 			fmt.Printf("Error initializing 'courseselected' as array: %v\n", err)
+// 			return nil, err
+// 		}
+// 	}
 
-	// Define the update operation to add the course to the Courseselected array
-	update := bson.M{
-		"$addToSet": bson.M{
-			"courseselected": courseName, // Adds the course if it's not already in the array
-		},
-	}
+// 	// Define the update operation to add the course to the Courseselected array
+// 	update := bson.M{
+// 		"$addToSet": bson.M{
+// 			"courseselected": courseName, // Adds the course if it's not already in the array
+// 		},
+// 	}
 
-	// Log the update operation for debugging
-	fmt.Printf("Update operation: %+v\n", update)
+// 	// Log the update operation for debugging
+// 	fmt.Printf("Update operation: %+v\n", update)
 
-	// Perform the update operation
-	updateResult, err := collection.UpdateOne(context.Background(), filter, update)
-	if err != nil {
-		// Log the error if update fails
-		fmt.Printf("Error updating student profile: %v\n", err)
-		return nil, err // Return the error if update fails
-	}
+// 	// Perform the update operation
+// 	updateResult, err := collection.UpdateOne(context.Background(), filter, update)
+// 	if err != nil {
+// 		// Log the error if update fails
+// 		fmt.Printf("Error updating student profile: %v\n", err)
+// 		return nil, err // Return the error if update fails
+// 	}
 
-	// Log the result of the update operation
-	fmt.Printf("Update result: %+v\n", updateResult)
+// 	// Log the result of the update operation
+// 	fmt.Printf("Update result: %+v\n", updateResult)
 
-	// Return the result of the update operation
-	return updateResult, nil
-}
+// 	// Return the result of the update operation
+// 	return updateResult, nil
+// }
 
 // InsertMCQ inserts a single MCQ document into the specified MongoDB collection.
 func InsertMCQ(mcq teacherModel.MCQ) (primitive.ObjectID, error) {
