@@ -249,7 +249,7 @@ func Checkuserstudent(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(response)
-	http.Redirect(w, r, "/index.html", http.StatusSeeOther)
+	// http.Redirect(w, r, "/index.html", http.StatusSeeOther)
 }
 
 // Helper function to generate JWT tokens
