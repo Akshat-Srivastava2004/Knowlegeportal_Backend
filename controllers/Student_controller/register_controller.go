@@ -207,11 +207,12 @@ func Checkuserstudent(w http.ResponseWriter, r *http.Request) {
 	var user1 models.StudentEnrolled
 	err1 := collection1.FindOne(ctx, bson.M{"email": email}).Decode(&user1)
 	if err1 != nil {
-		if err == mongo.ErrNoDocuments {
+		if err1 == mongo.ErrNoDocuments {
 			http.Error(w, "Email not found ", http.StatusUnauthorized)
 			return
 		} else {
 			http.Error(w, "Internal server error ", http.StatusInternalServerError)
+			return
 		}
 	}
 
