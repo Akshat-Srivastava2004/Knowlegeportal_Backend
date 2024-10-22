@@ -16,7 +16,7 @@ type StudentProfile struct {
 	Password        string             `json:"Password" bson:"Password"`
 	Gender          string             `json:"gender" bson:"gender"`
 	Address         string             `json:"address" bson:"address"`
-	Courseselected  string             `json:"courseselected" bson:"courseselected"`
+	// Courseselected  string             `json:"courseselected" bson:"courseselected"`
 	CreatedAt       time.Time          `json:"createdAt" bson:"createdAt"`
 	UpdatedAt       time.Time          `json:"updatedAt" bson:"updatedAt"`
 }
