@@ -281,3 +281,68 @@ func generateToken(id primitive.ObjectID, gender string, phonenumber int64, prof
 
 	return tokenString, nil
 }
+
+// Checkuser validates the teacher's login credentials and returns JWT tokens
+func Checkuser(w http.ResponseWriter, r *http.Request) {
+	// Set response headers
+	w.Header().Set("Access-Control-Allow-Origin", "https://knowlegeportal-production.up.railway.app/")
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Methods", "POST")
+
+	// Ensure the method is POST
+
+	// Now you can access the email and password from the struct
+	email := r.FormValue("Email")
+	password := r.FormValue("Password")
+
+	fmt.Println("User entered email is :", email)
+	fmt.Println("User entered password is :", password)
+
+	// Create a context with a timeout for MongoDB operations
+	ctx, cancel := context.WithTimeout(context.Background(), 40*time.Second)
+	defer cancel()
+
+	// Access the TeacherProfile collection in MongoDB
+	collection := database.GetCollection("TeacherProfile")
+
+	// Search for the user in the database using email
+	var user model.TeacherProfile
+	err := collection.FindOne(ctx, bson.M{"email": email}).Decode(&user)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			// User not found in the database
+			http.Error(w, `{"error": "User not found"}`, http.StatusUnauthorized)
+			return
+		}
+		// Internal server error (database issue)
+		http.Error(w, `{"error": "Internal server error"}`, http.StatusInternalServerError)
+		return
+	}
+
+	// Compare the hashed password with the provided password
+	password = strings.TrimSpace(password)
+	user.Password = strings.TrimSpace(user.Password)
+
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
+	if err != nil {
+		fmt.Println("Password comparison failed:", err)
+		http.Error(w, `{"error": "Invalid credentials"}`, http.StatusUnauthorized)
+		return
+	}
+
+	// Password matched
+	fmt.Println("Password matched")
+	session, _ := store.Get(r, "Teacher-session")
+	session.Values["teacherid"] = user.ID
+	session.Values["email"] = email
+	session.Values["username"] = user.Username
+	session.Values["course"] = user.CourseTeach
+	session.Options = &sessions.Options{
+		MaxAge:   3600, // 1 hour
+		HttpOnly: true, // Only accessible via HTTP (not JavaScript)
+	}
+
+	// Save the session
+	err = session.Save(r, w)
+	http.Redirect(w, r, "/resume.html", http.StatusSeeOther)
+}
