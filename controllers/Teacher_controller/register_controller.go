@@ -2,6 +2,7 @@ package teachercontroller
 
 import (
 	"context"
+	"encoding/gob"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -337,7 +338,7 @@ func Checkuser(w http.ResponseWriter, r *http.Request) {
 	session.Values["email"] = email
 	// session.Values["username"] = user.Username
 	session.Values["course"] = user.CourseTeach
-	fmt.Println("the value of course is ",session.Values["course"])
+	fmt.Println("the value of course is ", session.Values["course"])
 	session.Options = &sessions.Options{
 		MaxAge:   3600, // 1 hour
 		HttpOnly: true, // Only accessible via HTTP (not JavaScript)
@@ -345,8 +346,11 @@ func Checkuser(w http.ResponseWriter, r *http.Request) {
 
 	// Save the session
 	err = session.Save(r, w)
-	if err!=nil{
+	if err != nil {
 		panic(err)
 	}
 	http.Redirect(w, r, "/resume.html", http.StatusSeeOther)
+}
+func init() {
+	gob.Register(primitive.ObjectID{})
 }
