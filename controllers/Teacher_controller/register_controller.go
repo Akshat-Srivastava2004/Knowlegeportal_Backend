@@ -335,8 +335,9 @@ func Checkuser(w http.ResponseWriter, r *http.Request) {
 	session, _ := store.Get(r, "Teacher-session")
 	session.Values["teacherid"] = user.ID
 	session.Values["email"] = email
-	session.Values["username"] = user.Username
+	// session.Values["username"] = user.Username
 	session.Values["course"] = user.CourseTeach
+	fmt.Println("the value of course is ",session.Values["course"])
 	session.Options = &sessions.Options{
 		MaxAge:   3600, // 1 hour
 		HttpOnly: true, // Only accessible via HTTP (not JavaScript)
