@@ -345,5 +345,8 @@ func Checkuser(w http.ResponseWriter, r *http.Request) {
 
 	// Save the session
 	err = session.Save(r, w)
+	if err!=nil{
+		panic(err)
+	}
 	http.Redirect(w, r, "/resume.html", http.StatusSeeOther)
 }

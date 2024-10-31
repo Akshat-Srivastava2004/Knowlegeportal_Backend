@@ -240,7 +240,8 @@ func UploadResumeHandler(w http.ResponseWriter, r *http.Request) {
 
 	name := r.FormValue("name")
 	email := r.FormValue("email")
-
+	fmt.Println("the value of name is ", name)
+	fmt.Println("the value of email is ", email)
 	// Log basic info
 	log.Printf("Uploaded File: %v, Name: %s, Email: %s\n", handler.Filename, name, email)
 
