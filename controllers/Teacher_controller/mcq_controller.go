@@ -145,7 +145,13 @@ func EvaluateAnswersHandler(w http.ResponseWriter, r *http.Request) {
 	// Check score and set email content
 	if score > 5 { // Changed to check if score is greater than 20%
 		subject = "Subject: Congratulations!\n"
-		body = "Congratulations! You have passed the evaluation."
+		body = `Congratulations! You have successfully passed the Final evaluation round  and are now part of our teaching community. We're thrilled to have you onboard!
+
+Now you can access our Dashboard Portal using your existing login ID and password. This platform is designed to support you in guiding and inspiring students. Here is the link to get started: http://portal-production-2862.up.railway.app.
+
+As a valued teacher, you'll have the chance to share your expertise, make a meaningful impact, and connect with students eager to learn. Our portal is tailored to empower you in creating engaging and impactful learning experiences.
+
+Thank you for joining us in shaping the future, one student at a time!`
 	} else {
 		subject = "Subject: Application Status\n"
 		body = "We regret to inform you that your application will not proceed further."
