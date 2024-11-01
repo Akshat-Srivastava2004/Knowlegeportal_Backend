@@ -245,7 +245,7 @@ func UploadResumeHandler(w http.ResponseWriter, r *http.Request) {
 	// Log basic info
 	log.Printf("Uploaded File: %v, Name: %s, Email: %s\n", handler.Filename, name, email)
 
-	// Open Gemini Client
+	
 	ctx := context.Background()
 	apiKey := os.Getenv("GEMINI_API_KEY")
 	if apiKey == "" {
@@ -260,7 +260,7 @@ func UploadResumeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer client.Close()
 
-	// Upload the file to Gemini
+	
 	options := genai.UploadFileOptions{
 		DisplayName: handler.Filename,
 		MIMEType:    "application/pdf",
@@ -272,7 +272,7 @@ func UploadResumeHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Start a chat session and send resume for evaluation
+	
 	model := client.GenerativeModel("gemini-1.5-flash")
 	session := model.StartChat()
 	sess, err := store.Get(r, "Teacher-session")
@@ -300,58 +300,61 @@ func UploadResumeHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Extract and return the score from the response
+	
 	if len(resp.Candidates) > 0 && len(resp.Candidates[0].Content.Parts) > 0 {
 		score := resp.Candidates[0].Content.Parts[0]
-		scoreStr := fmt.Sprintf("%v", score)    // Convert the score to a string
-		scoreStr = strings.TrimSpace(scoreStr)  // Remove any surrounding whitespace or newlines
-		scoreInt, err := strconv.Atoi(scoreStr) // Convert the cleaned string to an integer
+		scoreStr := fmt.Sprintf("%v", score)
+		scoreStr = strings.TrimSpace(scoreStr)  
+		scoreInt, err := strconv.Atoi(scoreStr) 
 		if err != nil {
 			panic(err)
 		}
 
-		fmt.Fprintf(w, "Resume Evaluation Score (Integer): %d", scoreInt)
+		// fmt.Fprintf(w, "Resume Evaluation Score (Integer): %d", scoreInt)
 
-		// Email setup variables
+		
 		smtpHost := os.Getenv("EMAIL_HOST")
 		smtpPort := os.Getenv("EMAIL_PORT")
 		from := os.Getenv("EMAIL_HOST_USER")
-		smtpPassword := os.Getenv("EMAIL_HOST_PASSWORD") // Renamed to avoid conflict with the user's password
-		to := []string{email}                            // smtp.SendMail expects a slice of strings
+		smtpPassword := os.Getenv("EMAIL_HOST_PASSWORD") 
+		to := []string{email}                            
 
 		var subject string
 		var body string
 
-		// Check score and set email content
+		
 		if scoreInt > 20 {
 			subject = "Subject: Congratulations!\n"
 			body = "Congratulations! You have cleared the first round of the evaluation."
+			
 		} else {
 			subject = "Subject: Application Status\n"
 			body = "We regret to inform you that your application will not proceed further."
+			
 		}
 
 		message := []byte(subject + "\n" + body)
 
-		// SMTP authentication
+		
 		auth := smtp.PlainAuth("", from, smtpPassword, smtpHost)
 
-		// Send the email
+	
 		err = smtp.SendMail(smtpHost+":"+smtpPort, auth, from, to, message)
 		if err != nil {
 			fmt.Println("Failed to send email:", err)
 			http.Error(w, "Failed to send email notification", http.StatusInternalServerError)
 			return
 		}
+		http.Redirect(w, r, "/Teachertest.html", http.StatusSeeOther)
 		fmt.Println("Email sent successfully to:", email)
 	} else {
 		http.Error(w, "No score received", http.StatusInternalServerError)
 	}
 	fmt.Println("Email sent successfully to:", email)
-	http.Redirect(w, r, "/Teachertest.html", http.StatusSeeOther)
+	
 }
 func init() {
-	// Load .env file at the start of the application
+	
 	err := godotenv.Load(".env")
 	if err != nil {
 		log.Fatalf("Error loading .env file: %v", err)
