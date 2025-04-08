@@ -26,9 +26,9 @@ func main() {
     feedbackroute.FeedbackRouter(r)
 
     // Determine port for HTTP service
-    port := os.Getenv("PORT")
+	port := os.Getenv("PORT")
     if port == "" {
-        port = "8000" // Default port if not specified
+        port = "10000" // Default port for Render if not specified
     }
 
     // Set up CORS
@@ -40,6 +40,6 @@ func main() {
 
     handler := c.Handler(r)
 
-    fmt.Println("Server is starting on port:", port)
-    log.Fatal(http.ListenAndServe(":"+port, handler))
+    fmt.Printf("Server is starting on port: %s\n", port)
+    log.Fatal(http.ListenAndServe("0.0.0.0:"+port, handler))
 }
