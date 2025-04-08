@@ -28,7 +28,7 @@ import (
 
 // CreateUser handles user creation
 func CreateUser(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", "https://knowlegeportal-production.up.railway.app/")
+	w.Header().Set("Access-Control-Allow-Origin", "https://blue-meadow-0b28d241e.6.azurestaticapps.net/")
 	w.Header().Set("Content-Type", "multipart/form-data")
 	w.Header().Set("Access-Control-Allow-Methods", "POST")
 
@@ -286,7 +286,7 @@ func generateToken(id primitive.ObjectID, gender string, phonenumber int64, prof
 // Checkuser validates the teacher's login credentials and returns JWT tokens
 func Checkuser(w http.ResponseWriter, r *http.Request) {
 	// Set response headers
-	w.Header().Set("Access-Control-Allow-Origin", "https://knowlegeportal-production.up.railway.app/")
+	w.Header().Set("Access-Control-Allow-Origin", "https://blue-meadow-0b28d241e.6.azurestaticapps.net/")
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Methods", "POST")
 

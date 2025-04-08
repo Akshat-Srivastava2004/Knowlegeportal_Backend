@@ -1,33 +1,45 @@
 package main
 
 import (
-	"fmt"
-	"log"
-	"net/http"
+    "fmt"
+    "log"
+    "net/http"
+    "os"
 
-	courseroute "github.com/Akshat-Srivastava2004/educationportal/routes/Course_route"
-	feedbackroute "github.com/Akshat-Srivastava2004/educationportal/routes/Feedback_route"
-	studentroute "github.com/Akshat-Srivastava2004/educationportal/routes/Student_route"
-	teacherroute "github.com/Akshat-Srivastava2004/educationportal/routes/Teacher_route"
-	"github.com/gorilla/mux"
+    courseroute "github.com/Akshat-Srivastava2004/educationportal/routes/Course_route"
+    feedbackroute "github.com/Akshat-Srivastava2004/educationportal/routes/Feedback_route"
+    studentroute "github.com/Akshat-Srivastava2004/educationportal/routes/Student_route"
+    teacherroute "github.com/Akshat-Srivastava2004/educationportal/routes/Teacher_route"
+    "github.com/gorilla/mux"
+    "github.com/rs/cors"
 )
 
 func main() {
-	fmt.Println("Welcome to Education portal ")
-	r := mux.NewRouter()
-	// Define the session store globally
+    fmt.Println("Welcome to Education portal")
 
-	// Register teacher routes
-	teacherroute.Router(r)
+    r := mux.NewRouter()
 
-	// Register student routes
-	courseroute.CourseRouter(r)
-	studentroute.StudentRouter(r)
-	feedbackroute.FeedbackRouter(r)
-	fmt.Println("Server getting started ...")
+    // Register routes
+    teacherroute.Router(r)
+    courseroute.CourseRouter(r)
+    studentroute.StudentRouter(r)
+    feedbackroute.FeedbackRouter(r)
 
-	fs := http.FileServer(http.Dir("./template")) // Make sure this folder has index.html and other static files
-	r.PathPrefix("/").Handler(http.StripPrefix("/", fs))
-	log.Fatal(http.ListenAndServe(":8000", r))
-	fmt.Println("Listening at port 8000 ...")
+    // Determine port for HTTP service
+    port := os.Getenv("PORT")
+    if port == "" {
+        port = "8000" // Default port if not specified
+    }
+
+    // Set up CORS
+    c := cors.New(cors.Options{
+        AllowedOrigins: []string{"*"}, // Update this to your frontend's URL in production
+        AllowedMethods: []string{"GET", "POST", "PUT", "DELETE"},
+        AllowedHeaders: []string{"Content-Type", "Authorization"},
+    })
+
+    handler := c.Handler(r)
+
+    fmt.Println("Server is starting on port:", port)
+    log.Fatal(http.ListenAndServe(":"+port, handler))
 }
