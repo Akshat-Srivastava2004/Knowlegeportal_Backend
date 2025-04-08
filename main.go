@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	courseroute "github.com/Akshat-Srivastava2004/educationportal/routes/Course_route"
 	feedbackroute "github.com/Akshat-Srivastava2004/educationportal/routes/Feedback_route"
@@ -15,19 +16,23 @@ import (
 func main() {
 	fmt.Println("Welcome to Education portal ")
 	r := mux.NewRouter()
-	// Define the session store globally
 
-	// Register teacher routes
+	// Register routes
 	teacherroute.Router(r)
-
-	// Register student routes
 	courseroute.CourseRouter(r)
 	studentroute.StudentRouter(r)
 	feedbackroute.FeedbackRouter(r)
-	fmt.Println("Server getting started ...")
 
-	fs := http.FileServer(http.Dir("./template")) // Make sure this folder has index.html and other static files
+	// Serve static files
+	fs := http.FileServer(http.Dir("./template"))
 	r.PathPrefix("/").Handler(http.StripPrefix("/", fs))
-	log.Fatal(http.ListenAndServe(":8000", r))
-	fmt.Println("Listening at port 8000 ...")
+
+	// Get the port from the environment (Render provides this)
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8000" // Default port if not specified
+	}
+
+	fmt.Printf("Server starting on port %s...\n", port)
+	log.Fatal(http.ListenAndServe(":"+port, r))
 }
