@@ -42,10 +42,10 @@ func main() {
 	// ✅ Set Render port
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = "8000"
+		log.Fatal("PORT environment variable not set. Required for Render deployment.")
 	}
-
-	fmt.Println("Listening on port:", port)
+	
+	log.Println("Listening on port:", port)
 	err := http.ListenAndServe(":"+port, r)
 	if err != nil {
 		log.Fatal("Server failed to start:", err)
