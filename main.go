@@ -18,35 +18,29 @@ func main() {
 
 	r := mux.NewRouter()
 
-	// ✅ Serve the homepage (index.html)
+	// Health check
 	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "./template/index.html")
 	})
 
-	// ✅ Serve all HTML files like /about.html, /payment.html etc.
-	r.PathPrefix("/").Handler(http.StripPrefix("/", http.FileServer(http.Dir("./template"))))
+	// Static files
+	fs := http.FileServer(http.Dir("./template"))
+	r.PathPrefix("/").Handler(http.StripPrefix("/", fs))
 
-	// ✅ Serve CSS, JS, IMG, etc.
-	r.PathPrefix("/css/").Handler(http.StripPrefix("/css/", http.FileServer(http.Dir("./template/css"))))
-	r.PathPrefix("/js/").Handler(http.StripPrefix("/js/", http.FileServer(http.Dir("./template/js"))))
-	r.PathPrefix("/img/").Handler(http.StripPrefix("/img/", http.FileServer(http.Dir("./template/img"))))
-	r.PathPrefix("/lib/").Handler(http.StripPrefix("/lib/", http.FileServer(http.Dir("./template/lib"))))
-	r.PathPrefix("/scss/").Handler(http.StripPrefix("/scss/", http.FileServer(http.Dir("./template/scss"))))
-
-	// ✅ Backend routes
+	// Routes
 	teacherroute.Router(r)
 	courseroute.CourseRouter(r)
 	studentroute.StudentRouter(r)
 	feedbackroute.FeedbackRouter(r)
 
-	// ✅ Set Render port
+	// PORT and Bind Fix
 	port := os.Getenv("PORT")
 	if port == "" {
-		log.Fatal("PORT environment variable not set. Required for Render deployment.")
+		log.Fatal("PORT environment variable not set")
 	}
-	
-	log.Println("Listening on port:", port)
-	err := http.ListenAndServe(":"+port, r)
+
+	fmt.Println("Listening on port:", port)
+	err := http.ListenAndServe("0.0.0.0:"+port, r)
 	if err != nil {
 		log.Fatal("Server failed to start:", err)
 	}
