@@ -37,7 +37,10 @@ func main() {
         AllowedMethods: []string{"GET", "POST", "PUT", "DELETE"},
         AllowedHeaders: []string{"Content-Type", "Authorization"},
     })
-
+	r.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("OK"))
+	})
     handler := c.Handler(r)
 
     fmt.Printf("Server is starting on port: %s\n", port)
