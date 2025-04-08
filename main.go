@@ -18,26 +18,31 @@ func main() {
 
 	r := mux.NewRouter()
 
-	// Add this health check route (Render scans for these)
+	// ✅ Serve the homepage (index.html)
 	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("Server is running"))
+		http.ServeFile(w, r, "./template/index.html")
 	})
 
-	// Register your routes
+	// ✅ Serve all HTML files like /about.html, /payment.html etc.
+	r.PathPrefix("/").Handler(http.StripPrefix("/", http.FileServer(http.Dir("./template"))))
+
+	// ✅ Serve CSS, JS, IMG, etc.
+	r.PathPrefix("/css/").Handler(http.StripPrefix("/css/", http.FileServer(http.Dir("./template/css"))))
+	r.PathPrefix("/js/").Handler(http.StripPrefix("/js/", http.FileServer(http.Dir("./template/js"))))
+	r.PathPrefix("/img/").Handler(http.StripPrefix("/img/", http.FileServer(http.Dir("./template/img"))))
+	r.PathPrefix("/lib/").Handler(http.StripPrefix("/lib/", http.FileServer(http.Dir("./template/lib"))))
+	r.PathPrefix("/scss/").Handler(http.StripPrefix("/scss/", http.FileServer(http.Dir("./template/scss"))))
+
+	// ✅ Backend routes
 	teacherroute.Router(r)
 	courseroute.CourseRouter(r)
 	studentroute.StudentRouter(r)
 	feedbackroute.FeedbackRouter(r)
 
-	// Serve static files
-	fs := http.FileServer(http.Dir("./template"))
-	r.PathPrefix("/").Handler(http.StripPrefix("/", fs))
-
-	// ⬇️ This is CRUCIAL: use the port Render gives you
+	// ✅ Set Render port
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = "8000" // fallback for local dev
+		port = "8000"
 	}
 
 	fmt.Println("Listening on port:", port)
