@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"os"
 
 	courseroute "github.com/Akshat-Srivastava2004/educationportal/routes/Course_route"
 	feedbackroute "github.com/Akshat-Srivastava2004/educationportal/routes/Feedback_route"
@@ -14,35 +13,21 @@ import (
 )
 
 func main() {
-	fmt.Println("Welcome to Education portal")
-
+	fmt.Println("Welcome to Education portal ")
 	r := mux.NewRouter()
+	// Define the session store globally
 
-	// Add this health check route (Render scans for these)
-	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("Server is running"))
-	})
-
-	// Register your routes
+	// Register teacher routes
 	teacherroute.Router(r)
+
+	// Register student routes
 	courseroute.CourseRouter(r)
 	studentroute.StudentRouter(r)
 	feedbackroute.FeedbackRouter(r)
+	fmt.Println("Server getting started ...")
 
-	// Serve static files
-	fs := http.FileServer(http.Dir("./template"))
+	fs := http.FileServer(http.Dir("./template")) // Make sure this folder has index.html and other static files
 	r.PathPrefix("/").Handler(http.StripPrefix("/", fs))
-
-	// ⬇️ This is CRUCIAL: use the port Render gives you
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8000" // fallback for local dev
-	}
-
-	fmt.Println("Listening on port:", port)
-	err := http.ListenAndServe(":"+port, r)
-	if err != nil {
-		log.Fatal("Server failed to start:", err)
-	}
+	log.Fatal(http.ListenAndServe(":8000", r))
+	fmt.Println("Listening at port 8000 ...")
 }
