@@ -18,29 +18,30 @@ func main() {
 
 	r := mux.NewRouter()
 
-	// Health check
+	// Add this health check route (Render scans for these)
 	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "./template/index.html")
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("Server is running"))
 	})
 
-	// Static files
-	fs := http.FileServer(http.Dir("./template"))
-	r.PathPrefix("/").Handler(http.StripPrefix("/", fs))
-
-	// Routes
+	// Register your routes
 	teacherroute.Router(r)
 	courseroute.CourseRouter(r)
 	studentroute.StudentRouter(r)
 	feedbackroute.FeedbackRouter(r)
 
-	// PORT and Bind Fix
+	// Serve static files
+	fs := http.FileServer(http.Dir("./template"))
+	r.PathPrefix("/").Handler(http.StripPrefix("/", fs))
+
+	// ⬇️ This is CRUCIAL: use the port Render gives you
 	port := os.Getenv("PORT")
 	if port == "" {
-		log.Fatal("PORT environment variable not set")
+		port = "8000" // fallback for local dev
 	}
 
 	fmt.Println("Listening on port:", port)
-	err := http.ListenAndServe("0.0.0.0:"+port, r)
+	err := http.ListenAndServe(":"+port, r)
 	if err != nil {
 		log.Fatal("Server failed to start:", err)
 	}
