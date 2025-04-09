@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"strconv"
@@ -163,26 +162,19 @@ func Checkuserstudent(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
 		return
 	}
-	body, akb := ioutil.ReadAll(r.Body)
-	if akb != nil {
-		http.Error(w, "Failed to read request body", http.StatusInternalServerError)
-		return
-	}
-	fmt.Println("Request Body:", string(body))
-	// Unmarshal the JSON into the LoginRequest struct
-	var loginRequest LoginRequest
-	abf := json.Unmarshal(body, &loginRequest)
-	if abf != nil {
-		http.Error(w, "Failed to parse JSON", http.StatusBadRequest)
-		return
-	}
-
-	// Now you can access the email and password from the struct
-	email := loginRequest.Email
-	password := loginRequest.Password
-
-	fmt.Println("User entered email is :", email)
-	fmt.Println("User entered password is :", password)
+	 // Parse the form data
+	 err := r.ParseForm()
+	 if err != nil {
+		 http.Error(w, `{"error": "Failed to parse form data"}`, http.StatusBadRequest)
+		 return
+	 }
+ 
+	 // Access form values
+	 email := r.FormValue("Email")
+	 password := r.FormValue("Password")
+ 
+	 fmt.Println("Email:", email)
+	 fmt.Println("Password:", password)
 
 	// Create a context with a timeout for the database operation
 	ctx, cancel := context.WithTimeout(context.Background(), 40*time.Second)
@@ -192,7 +184,7 @@ func Checkuserstudent(w http.ResponseWriter, r *http.Request) {
 	collection1 := database.GetCollection("StudentEnrollment")
 	// Find the user in the database
 	var user model.StudentProfile
-	err := collection.FindOne(ctx, bson.M{"email": email}).Decode(&user)
+	err = collection.FindOne(ctx, bson.M{"email": email}).Decode(&user)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			// Email not found in the database
