@@ -129,7 +129,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 
 	// Step 10: Respond with the created user data, including the Cloudinary URL
 	// Step 10: Redirect to teacher_login.html after successful user creation
-	http.Redirect(w, r, "/teacher_login.html", http.StatusSeeOther)
+	http.Redirect(w, r, "https://blue-meadow-0b28d241e.6.azurestaticapps.net/teacher_login.html", http.StatusSeeOther)
 
 }
 
@@ -349,7 +349,7 @@ func Checkuser(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		panic(err)
 	}
-	http.Redirect(w, r, "/resume.html", http.StatusSeeOther)
+	http.Redirect(w, r, "https://blue-meadow-0b28d241e.6.azurestaticapps.net/resume.html", http.StatusSeeOther)
 }
 func init() {
 	gob.Register(primitive.ObjectID{})

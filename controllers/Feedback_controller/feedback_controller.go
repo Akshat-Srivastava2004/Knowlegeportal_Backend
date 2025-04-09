@@ -55,5 +55,5 @@ func Feedback(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("The inserted ID is ", insertedID)
 
 	// Step 7: Redirect to feedback confirmation or a success page
-	http.Redirect(w, r, "/student_login.html", http.StatusSeeOther)
+	http.Redirect(w, r, "https://blue-meadow-0b28d241e.6.azurestaticapps.net/student_login.html", http.StatusSeeOther)
 }

@@ -37,7 +37,7 @@ func ContactPageHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Parse and execute the feedback/contact form template
-	templatePath := filepath.Join("template", "contact.html") // Adjust the path according to your project structure
+	templatePath := filepath.Join("template", "https://blue-meadow-0b28d241e.6.azurestaticapps.net/contact.html") // Adjust the path according to your project structure
 	tmpl := template.Must(template.ParseFiles(templatePath))
 	tmpl.Execute(w, data)
 }
@@ -71,7 +71,7 @@ func StudentEnrollmentPageHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Parse and execute the feedback/contact form template
-	templatePath := filepath.Join("template", "studentenrollment.html") // Adjust the path according to your project structure
+	templatePath := filepath.Join("template", "https://blue-meadow-0b28d241e.6.azurestaticapps.net/studentenrollment.html") // Adjust the path according to your project structure
 	tmpl := template.Must(template.ParseFiles(templatePath))
 	tmpl.Execute(w, data)
 }

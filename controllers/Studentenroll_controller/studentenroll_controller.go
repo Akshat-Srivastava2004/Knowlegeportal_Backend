@@ -71,5 +71,5 @@ func Enrolledstudent(w http.ResponseWriter, r *http.Request) {
 	// fmt.Printf("Student profile updated successfully for student '%s'. Update result: %+v\n", email, profileUpdateResult)
 
 	// Redirect the user back to the form page after successful enrollment
-	http.Redirect(w, r, "/index.html", http.StatusSeeOther)
+	http.Redirect(w, r, "https://blue-meadow-0b28d241e.6.azurestaticapps.net/index.html", http.StatusSeeOther)
 }

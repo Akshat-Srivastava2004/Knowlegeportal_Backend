@@ -90,7 +90,7 @@ func TeacherMCq(w http.ResponseWriter, r *http.Request) {
 		mcqs[i] = strings.TrimSpace(mcq)
 	}
 
-	templatePath := filepath.Join("template", "MCQ.html")
+	templatePath := filepath.Join("template", "https://blue-meadow-0b28d241e.6.azurestaticapps.net/MCQ.html")
 	tmpl, err := template.ParseFiles(templatePath)
 	if err != nil {
 		log.Println("Error loading template:", err)

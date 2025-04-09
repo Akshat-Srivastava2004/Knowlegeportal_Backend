@@ -33,7 +33,7 @@ func main() {
 
     // Set up CORS
     c := cors.New(cors.Options{
-        AllowedOrigins: []string{"*"}, // Update this to your frontend's URL in production
+        AllowedOrigins: []string{"https://blue-meadow-0b28d241e.6.azurestaticapps.net/"}, // Update this to your frontend's URL in production
         AllowedMethods: []string{"GET", "POST", "PUT", "DELETE"},
         AllowedHeaders: []string{"Content-Type", "Authorization"},
     })

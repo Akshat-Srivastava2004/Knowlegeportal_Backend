@@ -129,7 +129,7 @@ func CreateUserstudent(w http.ResponseWriter, r *http.Request) {
 
 	// Step 10: Respond with the created user data, including the Cloudinary URL
 	// Step 10: Redirect to teacher_login.html after successful user creation
-	http.Redirect(w, r, "/student_login.html", http.StatusSeeOther)
+	http.Redirect(w, r, "https://blue-meadow-0b28d241e.6.azurestaticapps.net/student_login.html", http.StatusSeeOther)
 
 }
 

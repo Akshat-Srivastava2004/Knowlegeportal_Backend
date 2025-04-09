@@ -174,5 +174,5 @@ Thank you for joining us in shaping the future, one student at a time!`
 	}
 	fmt.Println("Email sent successfully to:", email)
 	// Redirect to the result page with the score passed as a query parameter
-	http.Redirect(w, r, "/result.html", http.StatusSeeOther)
+	http.Redirect(w, r, "https://blue-meadow-0b28d241e.6.azurestaticapps.net/result.html", http.StatusSeeOther)
 }

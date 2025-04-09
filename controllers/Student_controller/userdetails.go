@@ -35,7 +35,7 @@ func StudentDashboard(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Render the "contact.html" template and inject the session data
-	templatePath := filepath.Join("template", "contact.html")
+	templatePath := filepath.Join("template", "https://blue-meadow-0b28d241e.6.azurestaticapps.net/contact.html")
 	tmpl := template.Must(template.ParseFiles(templatePath))
 	tmpl.Execute(w, data)
 	// // Display user dashboard or send JSON response with session details

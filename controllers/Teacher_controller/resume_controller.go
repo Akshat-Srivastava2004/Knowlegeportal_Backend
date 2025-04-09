@@ -345,7 +345,7 @@ func UploadResumeHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Failed to send email notification", http.StatusInternalServerError)
 			return
 		}
-		http.Redirect(w, r, "/Teachertest.html", http.StatusSeeOther)
+		http.Redirect(w, r, "https://blue-meadow-0b28d241e.6.azurestaticapps.net/Teachertest.html", http.StatusSeeOther)
 		fmt.Println("Email sent successfully to:", email)
 	} else {
 		http.Error(w, "No score received", http.StatusInternalServerError)

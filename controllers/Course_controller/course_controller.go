@@ -43,5 +43,5 @@ func CreateCourse(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Println("the inserted idis ", insertedID)
 	fmt.Println("the coursed added successfully")
-	http.Redirect(w, r, "/form.html", http.StatusSeeOther)
+	http.Redirect(w, r, "https://blue-meadow-0b28d241e.6.azurestaticapps.net/form.html", http.StatusSeeOther)
 }
