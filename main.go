@@ -42,7 +42,7 @@ func main() {
 		w.Write([]byte("OK"))
 	})
     handler := c.Handler(r)
-
+	log.Fatal(http.ListenAndServe("0.0.0.0:"+port, handler))
     fmt.Printf("Server is starting on port: %s\n", port)
     log.Fatal(http.ListenAndServe("0.0.0.0:"+port, handler))
 }
