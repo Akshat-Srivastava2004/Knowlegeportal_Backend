@@ -280,7 +280,13 @@ func UploadResumeHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Session not found", http.StatusUnauthorized)
 		return
 	}
-	email = sess.Values["email"].(string)
+
+	email, ok := sess.Values["email"].(string)
+	fmt.Println("the value of email after 1st sound is ",email)
+	if !ok || email == "" {
+		http.Error(w, "Session expired. Please log in again.", http.StatusUnauthorized)
+		return
+	}
 	course := sess.Values["course"].(string)
 
 	session.History = []*genai.Content{
