@@ -253,6 +253,7 @@ func Checkuserstudent(w http.ResponseWriter, r *http.Request) {
 		"access_token":  accessToken,
 		"refresh_token": refreshToken,
 		"username":      username,
+		"email":email,
 	}
 
 	w.WriteHeader(http.StatusOK)
