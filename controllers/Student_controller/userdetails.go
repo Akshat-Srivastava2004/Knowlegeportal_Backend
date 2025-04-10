@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"path/filepath"
 )
-
 func StudentDashboard(w http.ResponseWriter, r *http.Request) {
 	// Retrieve the session
 	session, err := Store.Get(r, "Student-session")
@@ -13,7 +12,7 @@ func StudentDashboard(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Session not found", http.StatusUnauthorized)
 		return
 	}
-
+		
 	// Check if the session has expired by checking if "email" exists in the session
 	email, ok := session.Values["email"].(string)
 	if !ok || email == "" {

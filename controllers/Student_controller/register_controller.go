@@ -252,6 +252,7 @@ func Checkuserstudent(w http.ResponseWriter, r *http.Request) {
 	response := map[string]string{
 		"access_token":  accessToken,
 		"refresh_token": refreshToken,
+		"username":      username,
 	}
 
 	w.WriteHeader(http.StatusOK)
