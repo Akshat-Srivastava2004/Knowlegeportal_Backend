@@ -232,7 +232,9 @@ func Checkuserstudent(w http.ResponseWriter, r *http.Request) {
 	profilephoto := user.ProfilePhotoURL
 	phonenumber := user.Phonenumber
 	gender := user.Gender
+	emaill:=user.Email
 	id := user.ID
+	
 	// Generate JWT access and refresh tokens
 	accessToken, err := generateToken(id, gender, phonenumber, profilephoto, username, course, email, os.Getenv("ACCESS_TOKEN_SECRET"), os.Getenv("ACCESS_TOKEN_EXPIRY"))
 	if err != nil {
@@ -253,7 +255,7 @@ func Checkuserstudent(w http.ResponseWriter, r *http.Request) {
 		"access_token":  accessToken,
 		"refresh_token": refreshToken,
 		"username":      username,
-		"email":email,
+		"email":emaill,
 	}
 
 	w.WriteHeader(http.StatusOK)
