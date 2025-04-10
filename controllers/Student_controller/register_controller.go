@@ -15,7 +15,7 @@ import (
 	"github.com/Akshat-Srivastava2004/educationportal/database"
 	"github.com/Akshat-Srivastava2004/educationportal/helper"
 	model "github.com/Akshat-Srivastava2004/educationportal/models/Student_model"
-	models "github.com/Akshat-Srivastava2004/educationportal/models/Studentenrolled_model"
+	// models "github.com/Akshat-Srivastava2004/educationportal/models/Studentenrolled_model"
 	"github.com/cloudinary/cloudinary-go/v2/api/uploader"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/gorilla/sessions"
@@ -146,7 +146,8 @@ type Claims struct {
 	Profilephoto string `json:"profilephoto"`
 	Username     string `json:"username"`
 	Email        string `json:"email"`
-	Course       string `json:"course"`
+	// Course       string `json:"course"`
+
 	jwt.RegisteredClaims
 }
 
@@ -181,7 +182,7 @@ func Checkuserstudent(w http.ResponseWriter, r *http.Request) {
 	defer cancel()
 
 	collection := database.GetCollection("StudentProfile")
-	collection1 := database.GetCollection("StudentEnrollment")
+	// collection1 := database.GetCollection("StudentEnrollment")
 	// Find the user in the database
 	var user model.StudentProfile
 	err = collection.FindOne(ctx, bson.M{"email": email}).Decode(&user)
@@ -196,17 +197,17 @@ func Checkuserstudent(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	var user1 models.StudentEnrolled
-	err1 := collection1.FindOne(ctx, bson.M{"email": email}).Decode(&user1)
-	if err1 != nil {
-		if err1 == mongo.ErrNoDocuments {
-			http.Error(w, "Email not found yr  ", http.StatusUnauthorized)
-			return
-		} else {
-			http.Error(w, "Internal server error ", http.StatusInternalServerError)
-			return
-		}
-	}
+	// var user1 models.StudentEnrolled
+	// err1 := collection1.FindOne(ctx, bson.M{"email": email}).Decode(&user1)
+	// if err1 != nil {
+	// 	if err1 == mongo.ErrNoDocuments {
+	// 		http.Error(w, "Email not found yr  ", http.StatusUnauthorized)
+	// 		return
+	// 	} else {
+	// 		http.Error(w, "Internal server error ", http.StatusInternalServerError)
+	// 		return
+	// 	}
+	// }
 
 	fmt.Println("Stored hashed password:", user.Password)
 	fmt.Println("User provided password:", password)
@@ -226,8 +227,8 @@ func Checkuserstudent(w http.ResponseWriter, r *http.Request) {
 	}
 	// course := user.Courseselected
 	// fmt.Println("the user course is ", course)
-	course := user1.Coursename
-	fmt.Println("the course name is ", course)
+	// course := user1.Coursename
+	// fmt.Println("the course name is ", course)
 	username := user.Username
 	profilephoto := user.ProfilePhotoURL
 	phonenumber := user.Phonenumber
@@ -236,14 +237,14 @@ func Checkuserstudent(w http.ResponseWriter, r *http.Request) {
 	id := user.ID
 	
 	// Generate JWT access and refresh tokens
-	accessToken, err := generateToken(id, gender, phonenumber, profilephoto, username, course, email, os.Getenv("ACCESS_TOKEN_SECRET"), os.Getenv("ACCESS_TOKEN_EXPIRY"))
+	accessToken, err := generateToken(id, gender, phonenumber, profilephoto, username, emaill, os.Getenv("ACCESS_TOKEN_SECRET"), os.Getenv("ACCESS_TOKEN_EXPIRY"))
 	if err != nil {
 		fmt.Println("Error generating access token:", err)
 		http.Error(w, `{"error": "Failed to generate access token"}`, http.StatusInternalServerError)
 		return
 	}
 
-	refreshToken, err := generateToken(id, gender, phonenumber, profilephoto, username, course, email, os.Getenv("REFRESH_TOKEN_SECRET"), os.Getenv("REFRESH_TOKEN_EXPIRY"))
+	refreshToken, err := generateToken(id, gender, phonenumber, profilephoto, username,  emaill, os.Getenv("REFRESH_TOKEN_SECRET"), os.Getenv("REFRESH_TOKEN_EXPIRY"))
 	if err != nil {
 		fmt.Println("Error generating refresh token:", err)
 		http.Error(w, `{"error": "Failed to generate refresh token"}`, http.StatusInternalServerError)
@@ -264,7 +265,7 @@ func Checkuserstudent(w http.ResponseWriter, r *http.Request) {
 }
 
 // Helper function to generate JWT tokens
-func generateToken(id primitive.ObjectID, gender string, phonenumber int64, profilephoto, username string, course string, email, secret, expiry string) (string, error) {
+func generateToken(id primitive.ObjectID, gender string, phonenumber int64, profilephoto, username , emaill, secret, expiry string) (string, error) {
 	// Convert expiry time from string to duration
 	expiryDuration, err := time.ParseDuration(expiry)
 	if err != nil {
@@ -278,8 +279,8 @@ func generateToken(id primitive.ObjectID, gender string, phonenumber int64, prof
 		Gender:       gender,
 		Profilephoto: profilephoto,
 		Username:     username,
-		Email:        email,
-		Course:       course,
+		Email:        emaill,
+		
 
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(expiryDuration)),
