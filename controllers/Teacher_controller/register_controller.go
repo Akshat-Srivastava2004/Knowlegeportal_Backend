@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"strconv"
@@ -160,27 +159,13 @@ func Checkuserserver(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/x-www-form-urlencoded")
 	w.Header().Set("Access-Control-Allow-Methods", "POST")
 	// Ensure the method is POST
-	if r.Method != http.MethodPost {
-		http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, "Unable to parse form data", http.StatusBadRequest)
 		return
 	}
-	body, akb := ioutil.ReadAll(r.Body)
-	if akb != nil {
-		http.Error(w, "Failed to read request body", http.StatusInternalServerError)
-		return
-	}
-	fmt.Println("Request Body:", string(body))
-	// Unmarshal the JSON into the LoginRequest struct
-	var loginRequest LoginRequest
-	abf := json.Unmarshal(body, &loginRequest)
-	if abf != nil {
-		http.Error(w, "Failed to parse JSON", http.StatusBadRequest)
-		return
-	}
-
 	// Now you can access the email and password from the struct
-	email := loginRequest.Email
-	password := loginRequest.Password
+	email := r.FormValue("Email")
+	password := r.FormValue("Password")
 
 	fmt.Println("User entered email is :", email)
 	fmt.Println("User entered password is :", password)
