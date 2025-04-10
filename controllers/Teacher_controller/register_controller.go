@@ -224,7 +224,22 @@ func Checkuserserver(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, `{"error": "Failed to generate refresh token"}`, http.StatusInternalServerError)
 		return
 	}
+	session, _ := store.Get(r, "Teacher-session")
+	session.Values["teacherid"] = user.ID
+	session.Values["email"] = email
+	// session.Values["username"] = user.Username
+	session.Values["course"] = user.CourseTeach
+	fmt.Println("the value of course is ", session.Values["course"])
+	session.Options = &sessions.Options{
+		MaxAge:   3600, // 1 hour
+		HttpOnly: true, // Only accessible via HTTP (not JavaScript)
+	}
 
+	// Save the session
+	err = session.Save(r, w)
+	if err != nil {
+		panic(err)
+	}
 	// Send the tokens in the response
 	response := map[string]string{
 		"access_token":  accessToken,
