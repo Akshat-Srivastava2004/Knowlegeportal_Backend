@@ -244,6 +244,8 @@ func Checkuserserver(w http.ResponseWriter, r *http.Request) {
 	response := map[string]string{
 		"access_token":  accessToken,
 		"refresh_token": refreshToken,
+		"username":username,
+		"email":email,
 	}
 
 	w.WriteHeader(http.StatusOK)
