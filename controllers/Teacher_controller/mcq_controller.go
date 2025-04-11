@@ -107,7 +107,7 @@ func EvaluateAnswersHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, fmt.Sprintf("Error fetching MCQs: %v", err), http.StatusInternalServerError)
 		return
 	}
-
+    fmt.Println("the correct mcq agaye hain database se ",mcqs)
 	// Compare the user's answers with the correct answers
 	var correctCount int
 	for i, mcq := range mcqs {
@@ -123,8 +123,8 @@ func EvaluateAnswersHandler(w http.ResponseWriter, r *http.Request) {
 	// Calculate the score
 	totalQuestions := len(mcqs)
 	score := (float64(correctCount) / float64(totalQuestions)) * 100
-
-	// // Render the result as JSON or send a response to the client
+fmt.Println("the totalquestions of score is ",score)
+	// // Render the result as JSON or send a,score response to the client
 	// result := map[string]interface{}{
 	// 	"total_questions": totalQuestions,
 	// 	"correct_answers": correctCount,
@@ -140,7 +140,7 @@ func EvaluateAnswersHandler(w http.ResponseWriter, r *http.Request) {
 	var body string
 
 	// Check score and set email content
-	if score > 5 { // Changed to check if score is greater than 20%
+	if score > 1 { // Changed to check if score is greater than 20%
 		subject = "Subject: Congratulations!\n"
 		body = `Congratulations! You have successfully passed the Final evaluation round  and are now part of our teaching community. We're thrilled to have you onboard!
 
@@ -156,7 +156,7 @@ Thank you for joining us in shaping the future, one student at a time!`
 		w.Write([]byte("Your score is below 20%. Email notification not sent."))
 		return
 	}
-
+     fmt.Println("the score is ",score)
 	message := []byte(subject + "\n" + body)
 
 	// SMTP authentication
