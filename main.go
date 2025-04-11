@@ -36,6 +36,7 @@ func main() {
         AllowedOrigins: []string{"https://blue-meadow-0b28d241e.6.azurestaticapps.net"}, // Update this to your frontend's URL in production
         AllowedMethods: []string{"GET", "POST", "PUT", "DELETE"},
         AllowedHeaders: []string{"Content-Type", "Authorization"},
+        AllowCredentials: true,
     })
 	r.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
