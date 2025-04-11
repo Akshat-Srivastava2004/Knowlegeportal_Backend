@@ -89,9 +89,9 @@ func EvaluateAnswersHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Unauthorized: invalid token context", http.StatusUnauthorized)
 		return
 	}
-	err := r.ParseForm()
-	if err != nil {
-		http.Error(w, "Failed to parse form data", http.StatusBadRequest)
+	var answers map[string]string
+	if err := json.NewDecoder(r.Body).Decode(&answers); err != nil {
+		http.Error(w, "Invalid JSON body", http.StatusBadRequest)
 		return
 	}
 
@@ -109,12 +109,11 @@ func EvaluateAnswersHandler(w http.ResponseWriter, r *http.Request) {
 	}
     fmt.Println("the correct mcq agaye hain database se ",mcqs)
 	// Compare the user's answers with the correct answers
+	// Score calculation
 	var correctCount int
 	for i, mcq := range mcqs {
-		// Fetch the user's answer from the form data (assuming inputs are named as answer0, answer1, etc.)
-		userAnswer := r.FormValue("answer" + strconv.Itoa(i))
-
-		// Check if the user's answer matches the correct answer
+		key := "answer" + strconv.Itoa(i)
+		userAnswer := answers[key]
 		if userAnswer == mcq.CorrectAnswer {
 			correctCount++
 		}
