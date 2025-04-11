@@ -14,26 +14,27 @@ import (
 	models "github.com/Akshat-Srivastava2004/educationportal/models/Teacher_model"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"github.com/Akshat-Srivastava2004/educationportal/middleware"
+	"github.com/golang-jwt/jwt/v5"
 )
 
 // FetchQuestionsHandler - Fetch MCQs for the course stored in session
 func FetchQuestionsHandler(w http.ResponseWriter, r *http.Request) {
 	// Get the session
-	session, err := store.Get(r, "Teacher-session")
-	if err != nil {
-		http.Error(w, "Session error", http.StatusInternalServerError)
-		return
-	}
-
-	// Fetch the course from the session
-	courseName, ok := session.Values["course"].(string)
-	if !ok || courseName == "" {
-		http.Error(w, "Course not found in session", http.StatusForbidden)
-		return
-	}
+	w.Header().Set("Access-Control-Allow-Origin", "https://blue-meadow-0b28d241e.6.azurestaticapps.net")
+	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+	w.Header().Set("Access-Control-Allow-Credentials", "true") // If you're sending cookies or auth headers
+	claims, ok := r.Context().Value(middleware.UserContextKey).(jwt.MapClaims)
+   if !ok || claims == nil {
+	http.Error(w, "Unauthorized: invalid token context", http.StatusUnauthorized)
+	return
+}
+	// email := claims["email"].(string)
+	course := claims["course"].(string)
 
 	// Fetch MCQs from the database based on the course name
-	mcqs, err := FetchMCQsByCourse(courseName)
+	mcqs, err := FetchMCQsByCourse(course)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Error fetching MCQs: %v", err), http.StatusInternalServerError)
 		return
@@ -86,21 +87,17 @@ func EvaluateAnswersHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Get the session to retrieve the course
-	session, err := store.Get(r, "Teacher-session")
-	if err != nil {
-		http.Error(w, "Session error", http.StatusInternalServerError)
-		return
-	}
-
-	// Retrieve the course name from the session
-	courseName, ok := session.Values["course"].(string)
-	if !ok || courseName == "" {
-		http.Error(w, "Course not found in session", http.StatusForbidden)
-		return
-	}
+	claims, ok := r.Context().Value(middleware.UserContextKey).(jwt.MapClaims)
+if !ok || claims == nil {
+	http.Error(w, "Unauthorized: invalid token context", http.StatusUnauthorized)
+	return
+}
+	// email := claims["email"].(string)
+	course := claims["course"].(string)
+	email :=claims["email"].(string)
 
 	// Fetch the correct MCQs from the database based on the course name
-	mcqs, err := FetchMCQsByCourse(courseName)
+	mcqs, err := FetchMCQsByCourse(course)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Error fetching MCQs: %v", err), http.StatusInternalServerError)
 		return
@@ -128,11 +125,6 @@ func EvaluateAnswersHandler(w http.ResponseWriter, r *http.Request) {
 	// 	"correct_answers": correctCount,
 	// 	"score":           score,
 	// }
-	email, ok := session.Values["email"].(string) // Assume you stored the email in session
-	if !ok || email == "" {
-		http.Error(w, "Email not found in session", http.StatusForbidden)
-		return
-	}
 	smtpHost := os.Getenv("EMAIL_HOST")
 	smtpPort := os.Getenv("EMAIL_PORT")
 	from := os.Getenv("EMAIL_HOST_USER")
