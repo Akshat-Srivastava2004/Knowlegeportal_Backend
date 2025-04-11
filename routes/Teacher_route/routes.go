@@ -17,7 +17,7 @@ func Router(r *mux.Router) {
 	r.HandleFunc("/teacherdetails", teachercontroller.TeacherDashboard).Methods("GET")
 	r.HandleFunc("/teachertest", teachercontroller.TeacherMCq).Methods("GET")
 	r.HandleFunc("/upload", teachercontroller.UploadFile).Methods("POST")
-	r.HandleFunc("/quiz", teachercontroller.FetchQuestionsHandler).Methods("GET")
+	r.Handle("/quiz", middleware.AuthMiddleware(http.HandlerFunc(teachercontroller.FetchQuestionsHandler))).Methods("GET")
 	r.HandleFunc("/evaluate", teachercontroller.EvaluateAnswersHandler).Methods("POST")
 	// r.HandleFunc("/submit-mcq", teachercontroller.SubmitMCq).Methods("POST")
 
