@@ -189,7 +189,6 @@ import (
 	"os"
 	"strconv"
 	"strings"
-    "encoding/gob"
 	"encoding/json"
 	"github.com/Akshat-Srivastava2004/educationportal/middleware"
 	"github.com/golang-jwt/jwt/v5"
