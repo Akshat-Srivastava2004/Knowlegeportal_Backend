@@ -223,9 +223,14 @@ func TeacherDashboard(w http.ResponseWriter, r *http.Request) {
 // Function to handle the resume upload and scoring
 func UploadResumeHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "https://blue-meadow-0b28d241e.6.azurestaticapps.net")
+	w.Header().Set("Content-Type", "application/x-www-form-urlencoded")
+	w.Header().Set("Access-Control-Allow-Methods", "POST")
 	claims := r.Context().Value("user").(jwt.MapClaims)
 	email := claims["Email"].(string)
 	course := claims["Course"].(string)
+
+	fmt.Println("the email from the token is ",email)
+	fmt.Println("the course from the token is ",course)
 	// Parse the multipart form
 	err := r.ParseMultipartForm(10 << 20) // Max 10MB file size
 	if err != nil {
