@@ -226,8 +226,8 @@ func UploadResumeHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/x-www-form-urlencoded")
 	w.Header().Set("Access-Control-Allow-Methods", "POST")
 	claims := r.Context().Value("user").(jwt.MapClaims)
-	email := claims["Email"].(string)
-	course := claims["Course"].(string)
+	email := claims["email"].(string)
+	course := claims["course"].(string)
 
 	fmt.Println("the email from the token is ",email)
 	fmt.Println("the course from the token is ",course)

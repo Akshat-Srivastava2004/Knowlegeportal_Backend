@@ -50,7 +50,7 @@ func AuthMiddleware(next http.Handler) http.Handler {
 			http.Error(w, "Invalid token", http.StatusUnauthorized)
 			return
 		}
-		fmt.Println("✅ Token verified successfully for user:", claims["Email"]) // assuming your claims contain "email"
+		fmt.Println("✅ Token verified successfully for user:", claims["email"]) // assuming your claims contain "email"
 		ctx := context.WithValue(r.Context(), userContextKey, claims)
 
 		next.ServeHTTP(w, r.WithContext(ctx))
