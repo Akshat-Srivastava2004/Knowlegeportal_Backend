@@ -189,7 +189,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
-
+     "github.com/golang-jwt/jwt/v5"
 	"github.com/google/generative-ai-go/genai"
 	"github.com/joho/godotenv"
 	"google.golang.org/api/option"
@@ -223,6 +223,9 @@ func TeacherDashboard(w http.ResponseWriter, r *http.Request) {
 // Function to handle the resume upload and scoring
 func UploadResumeHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "https://blue-meadow-0b28d241e.6.azurestaticapps.net")
+	claims := r.Context().Value("user").(jwt.MapClaims)
+	email := claims["Email"].(string)
+	course := claims["Course"].(string)
 	// Parse the multipart form
 	err := r.ParseMultipartForm(10 << 20) // Max 10MB file size
 	if err != nil {
@@ -239,7 +242,6 @@ func UploadResumeHandler(w http.ResponseWriter, r *http.Request) {
 	defer file.Close()
 
 	name := r.FormValue("name")
-	email := r.FormValue("email")
 	fmt.Println("the value of name is ", name)
 	fmt.Println("the value of email is ", email)
 	// Log basic info
@@ -275,20 +277,6 @@ func UploadResumeHandler(w http.ResponseWriter, r *http.Request) {
 	
 	model := client.GenerativeModel("gemini-1.5-flash")
 	session := model.StartChat()
-	sess, err := store.Get(r, "Teacher-session")
-	if err != nil {
-		http.Error(w, "Session not found", http.StatusUnauthorized)
-		return
-	}
-
-	email, ok := sess.Values["email"].(string)
-	fmt.Println("the value of email after 1st sound is ",email)
-	if !ok || email == "" {
-		http.Error(w, "Session expired. Please log in again.", http.StatusUnauthorized)
-		return
-	}
-	course := sess.Values["course"].(string)
-
 	session.History = []*genai.Content{
 		{
 			Role: "user",
