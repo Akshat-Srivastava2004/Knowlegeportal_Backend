@@ -80,6 +80,15 @@ func FetchMCQsByCourse(courseName string) ([]models.MCQ, error) {
 // EvaluateAnswersHandler - Evaluate the user's quiz answers
 func EvaluateAnswersHandler(w http.ResponseWriter, r *http.Request) {
 	// Parse form data
+	w.Header().Set("Access-Control-Allow-Origin", "https://blue-meadow-0b28d241e.6.azurestaticapps.net")
+	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+	w.Header().Set("Access-Control-Allow-Credentials", "true") // If you're sending cookies or auth headers
+	claims, ok := r.Context().Value(middleware.UserContextKey).(jwt.MapClaims)
+	if !ok || claims == nil {
+		http.Error(w, "Unauthorized: invalid token context", http.StatusUnauthorized)
+		return
+	}
 	err := r.ParseForm()
 	if err != nil {
 		http.Error(w, "Failed to parse form data", http.StatusBadRequest)
@@ -87,11 +96,7 @@ func EvaluateAnswersHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Get the session to retrieve the course
-	claims, ok := r.Context().Value(middleware.UserContextKey).(jwt.MapClaims)
-if !ok || claims == nil {
-	http.Error(w, "Unauthorized: invalid token context", http.StatusUnauthorized)
-	return
-}
+
 	// email := claims["email"].(string)
 	course := claims["course"].(string)
 	email :=claims["email"].(string)
@@ -165,6 +170,17 @@ Thank you for joining us in shaping the future, one student at a time!`
 		return
 	}
 	fmt.Println("Email sent successfully to:", email)
+	response := map[string]interface{}{
+		"message":         "Email sent successfully",
+		"email":           email,
+		// "score":           score,
+		"total_questions": totalQuestions,
+		"correct_answers": correctCount,
+		"status":          "pass",
+	}
+	
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(response)
 	// Redirect to the result page with the score passed as a query parameter
-	http.Redirect(w, r, "https://blue-meadow-0b28d241e.6.azurestaticapps.net/result.html", http.StatusSeeOther)
+	// http.Redirect(w, r, "https://blue-meadow-0b28d241e.6.azurestaticapps.net/result.html", http.StatusSeeOther)
 }
