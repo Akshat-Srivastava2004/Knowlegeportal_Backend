@@ -301,7 +301,7 @@ if !ok || claims == nil {
 
 	resp, err := session.SendMessage(ctx, genai.Text(fmt.Sprintf(`
 Please evaluate this resume for the course %s and respond with a score as a **whole number only** between 0 and 100.
-Do not include extra words or formatting like "10/100", "score: 85", or "marks = 90". Just return a number like "85".
+Do not include extra words or formatting like "10/100", "score: 85", or "marks = 90". Just return a number like "85" and try to check the resume in a light way give atleast above 30 marks 
 `, course)))
 
 	if err != nil {
