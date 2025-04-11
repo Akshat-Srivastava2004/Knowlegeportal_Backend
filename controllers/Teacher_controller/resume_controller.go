@@ -223,8 +223,9 @@ func TeacherDashboard(w http.ResponseWriter, r *http.Request) {
 // Function to handle the resume upload and scoring
 func UploadResumeHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "https://blue-meadow-0b28d241e.6.azurestaticapps.net")
-	w.Header().Set("Content-Type", "application/x-www-form-urlencoded")
-	w.Header().Set("Access-Control-Allow-Methods", "POST")
+	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+	w.Header().Set("Access-Control-Allow-Credentials", "true") // If you're sending cookies or auth headers
 	claims := r.Context().Value("user").(jwt.MapClaims)
 	email := claims["email"].(string)
 	course := claims["course"].(string)
