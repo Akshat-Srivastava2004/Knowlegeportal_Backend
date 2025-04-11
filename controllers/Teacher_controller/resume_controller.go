@@ -189,7 +189,8 @@ import (
 	"os"
 	"strconv"
 	"strings"
-
+    "encoding/gob"
+	"encoding/json"
 	"github.com/Akshat-Srivastava2004/educationportal/middleware"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/generative-ai-go/genai"
@@ -352,6 +353,19 @@ if !ok || claims == nil {
 			return
 		}
 		fmt.Println("Email sent successfully to:", email)
+		response := map[string]interface{}{
+			"message": "Email sent successfully",
+			"score":   scoreInt,
+			"email":   email,
+			"status":  "passed",
+		}
+		
+		if scoreInt <= 20 {
+			response["status"] = "failed"
+		}
+		
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(response)
 	} else {
 		http.Error(w, "No score received", http.StatusInternalServerError)
 	}
