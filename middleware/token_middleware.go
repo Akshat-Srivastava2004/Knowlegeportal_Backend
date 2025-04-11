@@ -13,7 +13,7 @@ import (
 // 👇 custom context key type banaya
 type contextKey string
 
-const userContextKey = contextKey("user")
+const UserContextKey = contextKey("user")
 
 func verifyToken(tokenStr string, secret string) (jwt.MapClaims, error) {
 	token, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
@@ -51,7 +51,7 @@ func AuthMiddleware(next http.Handler) http.Handler {
 			return
 		}
 		fmt.Println("✅ Token verified successfully for user:", claims["email"]) // assuming your claims contain "email"
-		ctx := context.WithValue(r.Context(), userContextKey, claims)
+		ctx := context.WithValue(r.Context(), UserContextKey, claims)
 
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})

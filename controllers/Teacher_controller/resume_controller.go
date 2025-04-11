@@ -189,7 +189,9 @@ import (
 	"os"
 	"strconv"
 	"strings"
-     "github.com/golang-jwt/jwt/v5"
+
+	"github.com/Akshat-Srivastava2004/educationportal/middleware"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/generative-ai-go/genai"
 	"github.com/joho/godotenv"
 	"google.golang.org/api/option"
@@ -226,7 +228,11 @@ func UploadResumeHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
 	w.Header().Set("Access-Control-Allow-Credentials", "true") // If you're sending cookies or auth headers
-	claims := r.Context().Value("user").(jwt.MapClaims)
+	claims, ok := r.Context().Value(middleware.UserContextKey).(jwt.MapClaims)
+if !ok || claims == nil {
+	http.Error(w, "Unauthorized: invalid token context", http.StatusUnauthorized)
+	return
+}
 	email := claims["email"].(string)
 	course := claims["course"].(string)
 
