@@ -29,16 +29,20 @@ func Feedback(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Error parsing form: "+err.Error(), http.StatusBadRequest)
 		return
 	}
-
+    
 	// Step 2: Get session
 	email :=claims["email"].(string)
 	username:=claims["username"].(string)
+    
 
+	fmt.Println("the email in  the feedback is ",email)
+	fmt.Println("the username in the feedback is ",username)
 	// Step 3: Check if the session has expired by checking if "email" exists in the session
     
 	// Step 5: Create feedback struct
 	var feedback model.Feedback
 	 message:=r.FormValue("message")
+	fmt.Println("the message in the messageboxis ",message)
 	feedback.Message = r.FormValue("message")
 	feedback.Email = email
 	feedback.Username = username
