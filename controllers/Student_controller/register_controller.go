@@ -49,6 +49,9 @@ func CreateUserstudent(w http.ResponseWriter, r *http.Request) {
 	userstudent.Gender = r.FormValue("Gender")
 	userstudent.Address = r.FormValue("Address")
 
+
+	email:=r.FormValue("Email")
+	username:=r.FormValue("Username")
 	// Step 3: Convert the phone number to an integer
 	Phonenumber, err := strconv.ParseInt(Phonestr, 10, 64) // Use int64 to handle larger numbers
 	if err != nil {
@@ -125,11 +128,14 @@ func CreateUserstudent(w http.ResponseWriter, r *http.Request) {
 	insertedID := database.Insertstudent(userstudent)
 	userstudent.ID = insertedID
 	fmt.Println("The inserted ID is ", insertedID)
+    
+	response:=map[string]string{
+		"email":email,
+		"username":username,
+	}
 
-	// Step 10: Respond with the created user data, including the Cloudinary URL
-	// Step 10: Redirect to teacher_login.html after successful user creation
-	http.Redirect(w, r, "https://blue-meadow-0b28d241e.6.azurestaticapps.net/student_login.html", http.StatusSeeOther)
-
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(response)
 }
 
 // Struct for the login request

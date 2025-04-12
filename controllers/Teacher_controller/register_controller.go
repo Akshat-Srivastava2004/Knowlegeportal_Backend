@@ -40,7 +40,8 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	Phonestr := r.FormValue("Phonenumber")
 	// Step 2: Retrieve user profile data from the form field "user_data"
 	var user model.TeacherProfile
-
+    username :=r.FormValue("Username")
+	email :=r.FormValue("Email")
 	user.Fullname = r.FormValue("Fullname") // Replace with actual field names
 	user.Username = r.FormValue("Username")
 	user.Email = r.FormValue("Email")
@@ -126,10 +127,12 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	user.ID = insertedID
 	fmt.Println("The inserted ID is ", insertedID)
 
-	// Step 10: Respond with the created user data, including the Cloudinary URL
-	// Step 10: Redirect to teacher_login.html after successful user creation
-	http.Redirect(w, r, "https://blue-meadow-0b28d241e.6.azurestaticapps.net/teacher_login.html", http.StatusSeeOther)
-
+	response:=map[string]string{
+		"username":username,
+		"email":email,
+	}
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(response)
 }
 
 // Define the JWT Claims structure
